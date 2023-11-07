@@ -39,45 +39,39 @@
 use clipboard_files;
 
 fn main() {
-    let mut last_contents = String::new();
+    let mut last_contents = String::from("");
 
     loop {
         match clipboard_files::read() {
             Ok(file_paths) => {
-                // set last_content
-                let mut new_content = String::new();
-                for file_path in &file_paths {
+                let mut new_contents = String::new();
+                // reading clipboard
+                for file_path in file_paths {
                     match file_path.to_str() {
                         Some(value) => {
-                            new_content += value;
+                            if file_path.is_file() {
+                                //println!("Files: {}", value);
+                            }
+                            if file_path.is_dir() {
+                                //println!("Dir: {}", value);
+                            }
+
+                            new_contents += value;
                         }
-                        None => {}
-                    }
-                }
-
-                if new_content != last_contents {
-                    // reading clipboard
-                    for file_path in file_paths {
-                        match file_path.to_str() {
-                            Some(value) => {
-                                if file_path.is_file() {
-                                    println!("Files: {}", value);
-                                }
-                                if file_path.is_dir() {
-                                    println!("Dir: {}", value);
-                                }
-
-                                last_contents += value;
-                            }
-                            None => {
-                                last_contents = "".to_string();
-                            }
+                        None => {
+                            new_contents = "nada".to_string();
                         }
                     }
                 }
+
+                if last_contents != new_contents {
+                    println!("old: {} \nnew: {}", last_contents, new_contents);
+                    println!("---------------------------------------------");
+                }
+                last_contents = new_contents.clone();
             }
             Err(e) => {
-                last_contents = "".to_string();
+                //new_contents = "error".to_string();
             }
         }
     }
