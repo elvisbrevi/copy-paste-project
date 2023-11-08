@@ -18,15 +18,12 @@ fn main() {
         // if clipboard is file or directory
         match clipboard_files::read() {
             Ok(file_paths) => {
-                new_contents = String::new();
+                new_contents.clear();
                 clipboard_type = ClipboardType::FilesOrDirectories;
                 // reading clipboard
                 for file_path in file_paths {
-                    match file_path.to_str() {
-                        Some(value) => {
-                            new_contents += value;
-                        }
-                        None => {}
+                    if let Some(value) = file_path.to_str() {
+                        new_contents.push_str(value)
                     }
                 }
             }
@@ -37,13 +34,10 @@ fn main() {
 
         // if clipboard is only text
         if clipboard_type == ClipboardType::Text {
-            match ctx.get_contents() {
-                Ok(contents) => {
-                    if contents != old_contents {
-                        new_contents = contents.clone();
-                    }
+            if let Ok(contents) = ctx.get_contents() {
+                if contents != old_contents {
+                    new_contents = contents;
                 }
-                Err(_) => {}
             }
         }
 
@@ -56,6 +50,7 @@ fn main() {
             println!("old: {} \nnew: {}", old_contents, new_contents);
             println!("---------------------------------------------");
         }
-        old_contents = new_contents.clone();
+        //old_contents = std::mem::take(&mut new_contents);
+        old_contents = &new_contents;
     }
 }
